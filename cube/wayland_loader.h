@@ -120,5 +120,75 @@ static inline void *initialize_wayland() {
     return wayland_library;
 }
 
-#include "xdg-shell-client-header.h"
-#include "xdg-decoration-client-header.h"
+#include <libdecor-0/libdecor.h>
+
+typedef bool (*PFN_libdecor_configuration_get_content_size)(struct libdecor_configuration *configuration, struct libdecor_frame *frame, int *width, int *height);
+typedef struct libdecor_frame *(*PFN_libdecor_decorate)(struct libdecor *context, struct wl_surface *surface, struct libdecor_frame_interface *iface, void *user_data);
+typedef void(*PFN_libdecor_frame_commit)(struct libdecor_frame *frame, struct libdecor_state *state, struct libdecor_configuration *configuration);
+typedef struct xdg_toplevel *(*PFN_libdecor_frame_get_xdg_toplevel)(struct libdecor_frame *frame);
+typedef void (*PFN_libdecor_frame_set_title)(struct libdecor_frame *frame, const char *title);
+typedef void (*PFN_libdecor_frame_move)(struct libdecor_frame *frame, struct wl_seat *seat, uint32_t serial);
+typedef void (*PFN_libdecor_frame_unref)(struct libdecor_frame *frame);
+typedef struct libdecor *(*PFN_libdecor_new)(struct wl_display *display, struct libdecor_interface *iface);
+typedef void (*PFN_libdecor_state_free)(struct libdecor_state *state);
+typedef struct libdecor_state *(*PFN_libdecor_state_new)(int width, int height);
+typedef void (*PFN_libdecor_unref)(struct libdecor *context);
+
+static PFN_libdecor_configuration_get_content_size cube_libdecor_configuration_get_content_size = NULL;
+static PFN_libdecor_decorate cube_libdecor_decorate = NULL;
+static PFN_libdecor_frame_commit cube_libdecor_frame_commit = NULL;
+static PFN_libdecor_frame_get_xdg_toplevel cube_libdecor_frame_get_xdg_toplevel = NULL;
+static PFN_libdecor_frame_move cube_libdecor_frame_move = NULL;
+static PFN_libdecor_frame_set_title cube_libdecor_frame_set_title = NULL;
+static PFN_libdecor_frame_unref cube_libdecor_frame_unref = NULL;
+static PFN_libdecor_new cube_libdecor_new = NULL;
+static PFN_libdecor_state_free cube_libdecor_state_free = NULL;
+static PFN_libdecor_state_new cube_libdecor_state_new = NULL;
+static PFN_libdecor_unref cube_libdecor_unref = NULL;
+
+#define libdecor_configuration_get_content_size cube_libdecor_configuration_get_content_size
+#define libdecor_decorate cube_libdecor_decorate
+#define libdecor_frame_commit cube_libdecor_frame_commit
+#define libdecor_frame_get_xdg_toplevel cube_libdecor_frame_get_xdg_toplevel
+#define libdecor_frame_move cube_libdecor_frame_move
+#define libdecor_frame_set_title cube_libdecor_frame_set_title
+#define libdecor_frame_unref cube_libdecor_frame_unref
+#define libdecor_new cube_libdecor_new
+#define libdecor_state_free cube_libdecor_state_free
+#define libdecor_state_new cube_libdecor_state_new
+#define libdecor_unref cube_libdecor_unref
+
+static inline void *initialize_libdecor() {
+    void *libdecor_library = NULL;
+#if defined(LIBDECOR_LIBRARY)
+    libdecor_library = dlopen(LIBDECOR_LIBRARY, RTLD_NOW | RTLD_LOCAL);
+#endif
+    if (NULL == libdecor_library) {
+        libdecor_library = dlopen("libdecor-0.so.0", RTLD_NOW | RTLD_LOCAL);
+    }
+    if (NULL == libdecor_library) {
+        libdecor_library = dlopen("libdecor-0.so", RTLD_NOW | RTLD_LOCAL);
+    }
+    if (NULL == libdecor_library) {
+        return NULL;
+    }
+
+#ifdef __cplusplus
+#define TYPE_CONVERSION(type) reinterpret_cast<type>
+#else
+#define TYPE_CONVERSION(type)
+#endif
+    cube_libdecor_configuration_get_content_size = TYPE_CONVERSION(PFN_libdecor_configuration_get_content_size)(dlsym(libdecor_library, "libdecor_configuration_get_content_size"));
+    cube_libdecor_decorate = TYPE_CONVERSION(PFN_libdecor_decorate)(dlsym(libdecor_library, "libdecor_decorate"));
+    cube_libdecor_frame_commit = TYPE_CONVERSION(PFN_libdecor_frame_commit)(dlsym(libdecor_library, "libdecor_frame_commit"));
+    cube_libdecor_frame_get_xdg_toplevel = TYPE_CONVERSION(PFN_libdecor_frame_get_xdg_toplevel)(dlsym(libdecor_library, "libdecor_frame_get_xdg_toplevel"));
+    cube_libdecor_frame_set_title = TYPE_CONVERSION(PFN_libdecor_frame_set_title)(dlsym(libdecor_library, "libdecor_frame_set_title"));
+    cube_libdecor_frame_move = TYPE_CONVERSION(PFN_libdecor_frame_move)(dlsym(libdecor_library, "libdecor_frame_move"));
+    cube_libdecor_frame_unref = TYPE_CONVERSION(PFN_libdecor_frame_unref)(dlsym(libdecor_library, "libdecor_frame_unref"));
+    cube_libdecor_new = TYPE_CONVERSION(PFN_libdecor_new)(dlsym(libdecor_library, "libdecor_new"));
+    cube_libdecor_state_free = TYPE_CONVERSION(PFN_libdecor_state_free)(dlsym(libdecor_library, "libdecor_state_free"));
+    cube_libdecor_state_new = TYPE_CONVERSION(PFN_libdecor_state_new)(dlsym(libdecor_library, "libdecor_state_new"));    
+    cube_libdecor_unref = TYPE_CONVERSION(PFN_libdecor_unref)(dlsym(libdecor_library, "libdecor_unref"));
+    
+    return libdecor_library;
+}

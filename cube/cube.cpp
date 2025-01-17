@@ -40,6 +40,8 @@
 #if defined(VK_USE_PLATFORM_WAYLAND_KHR)
 #include <linux/input.h>
 #include "wayland_loader.h"
+#include "xdg-shell-client-header.h"
+#include "xdg-decoration-client-header.h"
 #endif
 
 #define VULKAN_HPP_DISPATCH_LOADER_DYNAMIC 1
